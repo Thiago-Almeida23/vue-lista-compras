@@ -4,14 +4,14 @@
         <form @submit.prevent="addItem">
             <div class="row my-3">
                 <div class="col-12">
-                    <label para="itemName">Nome do Item</label>
+                    <label for="itemName">Nome do Item</label>
                     <input type="text" v-model="itemName" class="form-control" required />
                 </div>
             </div>
 
             <div class="row my-2">
                 <div class="col-6">
-                    <label para="itemPrice">Preço</label>
+                    <label for="itemPrice">Preço</label>
                     <input type="text" v-model="itemPrice" class="form-control" @input="formatPrice" required />
                 </div>
 
