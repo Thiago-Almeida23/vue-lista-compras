@@ -4,12 +4,18 @@
 
     <div class="market-info">
       <label for="market">Mercado:</label>
-      <input 
-        v-model="currentMarket" 
-        type="text" 
-        class="form-control" 
-        required 
+      <input
+        v-model="currentMarket"
+        type="text"
+        class="form-control"
+        @input="showMarketSuggestions"
+        list="marketSuggestions"
+        required
       />
+      <!-- Lista de sugestões para o nome do mercado -->
+      <datalist id="marketSuggestions">
+        <option v-for="(suggestion, index) in filteredMarketSuggestions" :key="index" :value="suggestion" />
+      </datalist>
     </div>
 
     <AddItem @item-added="handleItemAdded" />
@@ -45,6 +51,8 @@ export default {
       shoppingList: [],
       savedLists: [],
       currentMarket: '',
+      markets: [], // Armazena os mercados já registrados
+      filteredMarketSuggestions: [], // Sugestões de mercado com base no input
     };
   },
   methods: {
@@ -63,6 +71,12 @@ export default {
         date,
       };
 
+      // Salva o nome do mercado no localStorage se ainda não estiver na lista
+      if (!this.markets.includes(this.currentMarket)) {
+        this.markets.push(this.currentMarket);
+        localStorage.setItem('markets', JSON.stringify(this.markets));
+      }
+
       this.savedLists.push(newList);
       localStorage.setItem('savedLists', JSON.stringify(this.savedLists));
       this.shoppingList = [];
@@ -72,12 +86,22 @@ export default {
     loadLists() {
       const saved = localStorage.getItem('savedLists');
       this.savedLists = saved ? JSON.parse(saved) : [];
+
+      // Carrega os mercados previamente salvos do localStorage
+      const storedMarkets = JSON.parse(localStorage.getItem('markets')) || [];
+      this.markets = storedMarkets;
     },
     removeList(index) {
       console.log('Removendo a lista na posição:', index);
       this.savedLists.splice(index, 1);
       localStorage.setItem('savedLists', JSON.stringify(this.savedLists));
       console.log('Listas salvas após remoção:', this.savedLists);
+    },
+    showMarketSuggestions() {
+      const input = this.currentMarket.toLowerCase();
+      this.filteredMarketSuggestions = this.markets.filter(market =>
+        market.toLowerCase().startsWith(input)
+      );
     },
   },
   mounted() {

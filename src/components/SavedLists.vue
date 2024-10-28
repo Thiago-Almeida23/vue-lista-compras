@@ -4,7 +4,7 @@
       <ul>
         <li v-for="(list, index) in lists" :key="index">
           <h4 @click="toggleList(index)" class="accordion-header">
-            Mercado: {{ list.market }} - {{ list.date }}
+            {{ list.market }} - {{ list.date }} - Total: R$ {{ getTotal(list).toFixed(2) }}
             <span class="accordion-toggle">{{ isOpen(index) ? '-' : '+' }}</span>
           </h4>
           <div v-if="isOpen(index)" class="accordion-content">
@@ -43,22 +43,23 @@ export default {
   },
   data() {
     return {
-      openListIndex: null, // Para controlar qual lista está aberta
+      openLists: [], // Array para controlar quais listas estão abertas
     };
   },
   methods: {
     toggleList(index) {
-      // Alterna a lista aberta
-      this.openListIndex = this.openListIndex === index ? null : index;
+      this.openLists[index] = !this.openLists[index]; // Alterna o estado de abertura da lista
     },
     isOpen(index) {
-      // Verifica se a lista está aberta
-      return this.openListIndex === index;
+      return !!this.openLists[index];
     },
     deleteList(index) {
-      // Emite um evento para excluir a lista correspondente
+
       this.$emit('delete-list', index);
     },
+    getTotal(list) {
+      return list.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    }
   },
 };
 </script>
@@ -69,12 +70,12 @@ export default {
 }
 
 .saved-lists ul {
-  list-style-type: none; /* Remove a bolinha antes da lista */
-  padding: 0; /* Remove o padding padrão da lista */
+  list-style-type: none;
+  padding: 0;
 }
 
 .saved-lists li {
-  margin-bottom: 10px; /* Espaçamento entre as listas salvas */
+  margin-bottom: 10px;
 }
 
 .accordion-header {
@@ -88,12 +89,8 @@ export default {
 }
 
 .accordion-content {
-  padding: 10px; /* Espaçamento interno para o conteúdo */
-  border: 1px solid #ddd; /* Borda para o conteúdo expandido */
-  border-top: none; /* Remove a borda superior */
-}
-
-.accordion-toggle {
-  margin-left: 10px; /* Espaçamento entre o texto e o ícone */
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin-top: 5px;
 }
 </style>
